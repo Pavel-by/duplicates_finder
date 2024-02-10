@@ -1,0 +1,19 @@
+{
+  "name": "huawei_task",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "dependencies": {
+    "ts-node": "^10.9.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.17",
+    "typescript": "^5.3.3"
+  },
+  "scripts": {
+    "solution-raw-comparing": "node -r ts-node/register ./lib/solution_raw_comparing.ts",
+    "solution-hash-comparing": "node -r ts-node/register ./lib/solution_hash_comparing.ts"
+  },
+  "author": "Pavel Mironchik",
+  "license": "ISC"
+}
