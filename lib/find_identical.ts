@@ -3,7 +3,7 @@ import { CompareFilesRequest, CompareFilesResponse } from './workers/compare_fil
 import { ObtainFileHashRequest, ObtainFileHashResponse } from './workers/obtain_file_hash_protocol';
 import mergeSortAsync from './merge_sort_async';
 import { Balancer } from './balancer';
-import { resolve } from 'path';
+import { resolve, relative } from 'path/posix';
 
 async function collectFilesFromDir(path: string, filenames: Array<string>): Promise<void> {
   let dirents = await readdir(path, {
@@ -47,17 +47,20 @@ async function findIdenticalByRawComparing(path: string, threadsCount: number): 
   let filenames = await findAllFilenames(path);
   console.log(`${filenames.length} files were found`);
 
-  let scheduler = new Balancer<CompareFilesRequest, CompareFilesResponse>("./lib/workers/compare_files_worker.js", threadsCount);
+  let balancer = new Balancer<CompareFilesRequest, CompareFilesResponse>("./lib/workers/compare_files_worker.js", threadsCount);
   let comparator = async (filename1: string, filename2: string) => {
-    let response = await scheduler.executeTask({ filename1, filename2 });
+    let response = await balancer.executeTask({ filename1, filename2 });
     return response.result;
   };
   console.log("Sorting found files...");
   await mergeSortAsync(filenames, comparator);
   console.log("Grouping sorted files...");
   let groupedFilenames = await groupIdenticalFromSorted(filenames, comparator);
-  await scheduler.terminate();
+  await balancer.terminate();
 
+  groupedFilenames = groupedFilenames.map((filenames) => {
+    return filenames.map((filename) => relative(path, filename));
+  })
   return groupedFilenames;
 }
 
@@ -66,23 +69,23 @@ async function findIdenticalByHashesComparing(path: string, threadsCount: number
   let filenames = await findAllFilenames(path);
   console.log(`${filenames.length} files were found`);
 
-  let scheduler = new Balancer<ObtainFileHashRequest, ObtainFileHashResponse>("./lib/workers/obtain_file_hash_worker.js", threadsCount);
+  let balancer = new Balancer<ObtainFileHashRequest, ObtainFileHashResponse>("./lib/workers/obtain_file_hash_worker.js", threadsCount);
   console.log("Obtaining hashes for found files...")
   let hashesPromises = filenames.map(async (filename) => {
-    let response = await scheduler.executeTask({ filename });
+    let response = await balancer.executeTask({ filename });
     return {
       filename: filename,
       hash: response.hash,
     }
   });
   let hashes = await Promise.all(hashesPromises);
-  await scheduler.terminate();
+  await balancer.terminate();
 
   hashes.sort((a, b) => a.hash.localeCompare(b.hash));
   let groupedHashes = await groupIdenticalFromSorted(hashes, async (a, b) => a.hash.localeCompare(b.hash))
 
   return groupedHashes.map((group) => {
-    return group.map((hash) => hash.filename);
+    return group.map((hash) => relative(path, hash.filename));
   });
 }
 
