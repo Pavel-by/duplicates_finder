@@ -54,7 +54,7 @@ async function findIdenticalByRawComparing(path: string, threadsCount: number): 
   let filenames = await findAllFilenames(path);
   console.log(`${filenames.length} files were found`);
 
-  let balancer = new Balancer<CompareFilesRequest, CompareFilesResponse>("./lib/workers/compare_files_worker.js", threadsCount);
+  let balancer = new Balancer<CompareFilesRequest, CompareFilesResponse>("./lib/workers/compare_files_worker.ts", threadsCount);
   let comparator = async (filename1: string, filename2: string) => {
     let response = await balancer.executeTask({ filename1, filename2 });
     return response.result;
@@ -76,7 +76,7 @@ async function findIdenticalByHashesComparing(path: string, threadsCount: number
   let filenames = await findAllFilenames(path);
   console.log(`${filenames.length} files were found`);
 
-  let balancer = new Balancer<ObtainFileHashRequest, ObtainFileHashResponse>("./lib/workers/obtain_file_hash_worker.js", threadsCount);
+  let balancer = new Balancer<ObtainFileHashRequest, ObtainFileHashResponse>("./lib/workers/obtain_file_hash_worker.ts", threadsCount);
   console.log("Obtaining hashes for found files...")
   let hashesPromises = filenames.map(async (filename) => {
     let response = await balancer.executeTask({ filename });

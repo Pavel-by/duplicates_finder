@@ -9,7 +9,9 @@ class WorkerController<Request, Response> {
 
   constructor(workerFilename: string) {
     this.workerFilename = workerFilename
-    this._worker = new Worker(workerFilename)
+    this._worker = new Worker(workerFilename, {
+      execArgv: ["-r", "ts-node/register"],
+    })
     this._worker.on('message', this.onMessage.bind(this));
   }
 
