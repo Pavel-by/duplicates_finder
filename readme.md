@@ -7,13 +7,13 @@ Node `v20.11.0` had been used, but should work fine starting from `v16.11.0`. No
 * `npm install`
 * `npm run solution-raw-comparing` or `npm run solution-hash-comparing`
 
-## First solution. Raw content comparation
+## First solution. Raw content comparison
 
 `npm run solution-raw-comparing`
 
 That is a unefficient but funny solution. What it does:
 
-1. Let's define `compare_files` background task - it receives two filenames and sends response with content comparation result (-1, 0 or 1). We're comparing raw binary contents - reading files by chunks until some difference or file end.
+1. Let's define `compare_files` background task - it receives two filenames and sends response with content comparison result (-1, 0 or 1). We're comparing raw binary contents - reading files by chunks until some difference or file end.
 2. Now we're should read all filenames in a target directory into `filenames` array with recursive function, that iterates over all nested directories.
 3. Core part: sorting filenames array with asynchronous variant of MergeSort algorithm using `compare_files` background task as comparing function. That is the heaviest part with O(n*logn) complexity, where `n = filenames.length` and each iteration is request to background worker.
 4. Finalizing sorted `filenames` by grouping using `compare_files` - we can do it with a linear complexity.
@@ -21,7 +21,7 @@ That is a unefficient but funny solution. What it does:
 
 PS: we could use some caches to `compare_files` task to reuse some requests from 3rd step in 4th, but that is not really required.
 
-## Second solution. Hashes comparation
+## Second solution. Hashes comparison
 
 `npm run solution-hash-comparing`
 
