@@ -26,10 +26,10 @@ PS: we could cache `compare_files` task requests to reuse 3rd step requests in 4
 `npm run solution-hash-comparing`
 
 1. Let's define `obtain_file_hash` bakground task. It receives a `filename` and sends a response with `md5` hash of file content.
-2. Read all `filenames` same as in 2nd step of first solution.
+2. Read all filenames from a target directory into `filenames` array using recursive function, that iterates over all nested directories.
 3. Generate hashes for each item of `filenames` array with `obtain_file_hash` task.
-4. Sort `filenames` with standard `sort` function using hashes comparator.
-5. Finalize sorted `filenames` by grouping using hash comparing.
+4. Sort `filenames` with standard `sort` function using hashes comparator - `O(n * logn)` complexity.
+5. Finalize sorted `filenames` by grouping using hash comparing - `O(n)` complexity.
 6. Done!
 
 ## What's better?
