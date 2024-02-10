@@ -4,11 +4,18 @@ import { ObtainFileHashRequest, ObtainFileHashResponse } from './workers/obtain_
 import mergeSortAsync from './merge_sort_async';
 import { Balancer } from './balancer';
 import { resolve, relative } from 'path/posix';
+import { Dirent } from 'fs';
 
 async function collectFilesFromDir(path: string, filenames: Array<string>): Promise<void> {
-  let dirents = await readdir(path, {
-    withFileTypes: true,
-  });
+  let dirents: Array<Dirent> = [];
+  try {
+    dirents = await readdir(path, {
+      withFileTypes: true,
+    });
+  } catch (e) {
+    console.log(`Failed to read directory ${path}`)
+  }
+
   for (let dirent of dirents) {
     let fullPath = resolve(path, dirent.name);
     if (dirent.isDirectory())
@@ -20,7 +27,7 @@ async function collectFilesFromDir(path: string, filenames: Array<string>): Prom
 
 async function findAllFilenames(path: string): Promise<Array<string>> {
   let result = Array<string>();
-  await collectFilesFromDir(path, result);
+  await collectFilesFromDir(resolve(path), result);
   return result;
 }
 
