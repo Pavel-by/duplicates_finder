@@ -21,6 +21,10 @@ async function collectFilesFromDir(path: string, filenames: Array<string>): Prom
   }
 }
 
+/**
+ * Iterates recursively through given `path` directory and returns
+ * **absolute** paths for all found files.
+ */
 async function findAllFilenames(path: string): Promise<Array<string>> {
   let result = Array<string>();
   await collectFilesFromDir(resolve(path), result);

@@ -1,3 +1,16 @@
+/**
+ * Example:
+ *
+ * ```
+ * groupIdenticalFromSorted([
+ *  1,1,1,2,2,3,3,3
+ * ], async (a, b) => a - b);
+ * ```
+ *
+ * will return
+ *
+ * `[[1,1,1], [2,2], [3,3,3]]`
+ */
 async function groupIdenticalFromSorted<T>(arr: Array<T>, comp: (a: T, b: T) => Promise<number>): Promise<Array<Array<T>>> {
   let comparePromises = Array<Promise<number>>(arr.length);
   for (let i = 0; i < arr.length - 1; i++) {

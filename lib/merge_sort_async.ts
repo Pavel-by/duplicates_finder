@@ -32,6 +32,11 @@ async function mergeSortInner<T>(arr: Array<T>, comp: Comparator<T>, start: numb
     arr[i] = cache[i];
 }
 
+/**
+ * MergeSort algorithm asynchronous recursive variant.
+ *
+ * See https://en.wikipedia.org/wiki/Merge_sort for algorithm explanation
+ */
 function mergeSortAsync<T>(arr: Array<T>, comp: Comparator<T>): Promise<void> {
   let cache = new Array<T>(arr.length);
   return mergeSortInner(arr, comp, 0, arr.length, cache);

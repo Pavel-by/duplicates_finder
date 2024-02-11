@@ -44,6 +44,11 @@ interface BalancerTask<Request, Response> {
   callback: TaskCallback<Response>
 }
 
+/**
+ * Creates `workersLimit` workers with `workerFilename` typescript
+ * entry points and handles requests balancing beteween them. All
+ * requests will pe queued until free worker found.
+ */
 class Balancer<Request, Response> {
   readonly workerFilename: string
   readonly workersLimit: number
