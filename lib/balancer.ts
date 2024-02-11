@@ -1,5 +1,6 @@
 import { assert } from 'console';
 import { Worker } from 'worker_threads';
+import { Queue } from './queue';
 
 type TaskCallback<Response> = (result: Response) => void;
 
@@ -53,7 +54,7 @@ class Balancer<Request, Response> {
   readonly workerFilename: string
   readonly workersLimit: number
   private workers: Array<WorkerController<Request, Response>>
-  private tasksQueue: Array<BalancerTask<Request, Response>> = []
+  private tasksQueue: Queue<BalancerTask<Request, Response>> = new Queue()
 
   constructor(workerFilename: string, workersLimit: number) {
     this.workerFilename = workerFilename;
@@ -67,7 +68,7 @@ class Balancer<Request, Response> {
 
   private async executeQueuedTasks() {
     let workerIndex = 0
-    while (this.tasksQueue.length > 0 && workerIndex < this.workers.length) {
+    while (this.tasksQueue.canPop && workerIndex < this.workers.length) {
       if (this.workers[workerIndex].canExecuteTask) {
         let task = this.tasksQueue.pop();
         this.workers[workerIndex].executeTask(task.data, task.callback);
@@ -93,7 +94,7 @@ class Balancer<Request, Response> {
     console.log(`Balancer: terminating workers ${this.workerFilename}`)
     await Promise.all(this.workers.map((w) => w.terminate()));
     this.workers = [];
-    this.tasksQueue = [];
+    this.tasksQueue.clear();
   }
 }
 
