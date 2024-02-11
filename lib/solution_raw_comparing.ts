@@ -23,7 +23,7 @@ async function findIdenticalByRawComparing(path: string, threadsCount: number): 
   await balancer.terminate();
 
   return groupedFilenames.map((filenames) => {
-    // convert relative paths to absolute
+    // convert absolute paths to relative
     return filenames.map((filename) => relative(path, filename));
   });
 }

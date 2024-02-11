@@ -10,11 +10,16 @@ const openAsync = promisify(open);
 const readAsync = promisify(read);
 const closeAsync = promisify(close);
 
-let buf1 = Buffer.alloc(DEFAULT_BUFFER_SIZE);
-let buf2 = Buffer.alloc(DEFAULT_BUFFER_SIZE);
 
+/**
+ * Files could be large (or why do we need a different threads?). So
+ * we want to read a file chunk by chunk and compare this chunks until
+ * any difference or end of files found.
+ */
 async function compareFilesByDescriptors(fd1: number, fd2: number): Promise<number> {
   let offset = 0;
+  let buf1 = Buffer.alloc(DEFAULT_BUFFER_SIZE);
+  let buf2 = Buffer.alloc(DEFAULT_BUFFER_SIZE);
   while (true) {
     let [{ bytesRead: bytesRead1 }, { bytesRead: bytesRead2 }] = await Promise.all([
       readAsync(fd1, buf1, 0, DEFAULT_BUFFER_SIZE, offset),
@@ -32,6 +37,10 @@ async function compareFilesByDescriptors(fd1: number, fd2: number): Promise<numb
 }
 
 async function compareFilesByFilenames(filename1: string, filename2: string): Promise<number> {
+  // Some exception catching would be nice there - but any
+  // incorrect response from this worker will break sorting
+  // algorithm, so I just couldn't deside how to react to them.
+  // Let's assume that we're in ideal world with no fs errors :/
   let [fd1, fd2] = await Promise.all([
     openAsync(filename1, 'r'),
     openAsync(filename2, 'r'),
@@ -45,6 +54,10 @@ async function compareFilesByFilenames(filename1: string, filename2: string): Pr
 }
 
 parentPort.on('message', async (message: CompareFilesRequest) => {
+  // Yep, that code is not supposed to receive a new message until
+  // previous is processed - balancer should control this. If we
+  // want to process multiple messages at the same time, `taskId`
+  // or any another identifier should be returned with postMessage.
   let result = await compareFilesByFilenames(message.filename1, message.filename2);
   parentPort.postMessage({ result });
 })
