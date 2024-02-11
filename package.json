@@ -2,7 +2,7 @@
   "name": "huawei_task",
   "version": "1.0.0",
   "description": "",
-  "main": "find_identical.ts",
+  "main": "./lib/solution_hash_comparing.ts",
   "dependencies": {
     "ts-node": "^10.9.2"
   },
