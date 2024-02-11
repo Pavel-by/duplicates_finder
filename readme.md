@@ -39,3 +39,5 @@ Well, I absolutely don't know where to apply first solution.
 * and can not handle `compare_files` task failure (f.e. user can delete a file) - invalid `compare_files` result breaks sort algorithm.
 
 The only advancement of first solution is sustainability to possible hash collisions in comparison with second variant, but it is not look like really dangerous thing.
+
+PS: do not be afraid of slow working program. We're just running a workers with raw typescript files without precompiling, so it takes some time for workers to compile .ts and start handling messages.
